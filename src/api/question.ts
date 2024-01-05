@@ -42,5 +42,5 @@ questionRouter.post(Endpoint.DELETE_QUESTION, asyncHandler(async (req, res) => {
     const data = await questionService.deletetQuestions(req.body)
     return res.json(data)
 }))
-
+s
 export { questionRouter };

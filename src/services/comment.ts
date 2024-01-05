@@ -88,18 +88,26 @@ export default class CommentService {
   sendReactionComment = async (body: { idComment: string, idUser: string, type: number, realTime?: boolean }) => {
     const { idComment, idUser, type, realTime = true } = body
     try {
-      let comment = await CommentModel.findOne({ _id: idComment });
-      if(comment) {
-        let react = [...comment.react || []];
-        
+      const comment = await CommentModel.findById(idComment);
+      if (comment) {
+        let react  = [...comment.react || []];
+        const existingReactionIndex = react.findIndex(react => react.idUser === idUser);
+
+        if (existingReactionIndex !== -1) {
+          if (react[existingReactionIndex].type === type) {
+            react.splice(existingReactionIndex, 1);
+          } else {
+            react[existingReactionIndex].type = type;
+          }
+        } else {
+          react.push({ type, idUser });
+        }
+
         const updateComment = await CommentModel.findOneAndUpdate(
           { _id: idComment },
           {
             $set: {
-              react : react.find(o => o.idUser === idUser) ? react.filter(o => o.idUser !== idUser) : [...react, {
-                type: type, 
-                idUser
-              }],
+              react,
               updateDate: Date.now(),
             },
           },
