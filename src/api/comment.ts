@@ -1,6 +1,6 @@
 import express from 'express';
 import CommentService from '../services/comment';
-import ENDPONTAPI from '../../submodule/common/endpoint';
+import ENDPONTAPI from '../submodule/common/endpoint';
 import asyncHandler from '../utils/async_handle';
 
 const commentRouter = express.Router();

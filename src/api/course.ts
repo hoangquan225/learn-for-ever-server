@@ -33,15 +33,24 @@ courseRouter.post(Endpoint.GET_COURSES_BY_ID_TAG_AND_CATEGORY, asyncHandler(asyn
 }))
 
 courseRouter.post(Endpoint.GET_COURSE_BY_SLUG, asyncHandler(async (req, res) => {
+    const { isInfoTopic = false, status = TTCSconfig.STATUS_PUBLIC, slug } = req.query
     const data = await courseService.getCoursesBySlug({
-        slug: `${req.query.slug || ''}`, 
-        status: Number(req.query.status)
+        slug: `${slug || ''}`, 
+        status: Number(status),
+        isInfoTopic: Boolean(isInfoTopic)
     })
     return res.json(data)
 }))
 
 courseRouter.post(Endpoint.UPDATE_COURSE, asyncHandler(async (req, res) => {
     const data = await courseService.updateCourse(new Course(req.body))
+    return res.json(data)
+}))
+
+courseRouter.post(Endpoint.GET_INFO_TOPIC_BY_COURSE, asyncHandler(async (req, res) => {
+    const data = await courseService.getInfoTopicByCourse({
+        idCourse: `${req.query.idCourse}`
+    })
     return res.json(data)
 }))
 

@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { BadRequestError } from "../common/errors";
 import { TopicModel } from "../database/topic";
 import TTCSconfig from "../submodule/common/config";
@@ -195,5 +196,92 @@ export default class TopicService {
         } catch (error) {
             throw new BadRequestError();
         }
+    }
+
+    getTopicsByCourseMoblie = async (body: {
+        idCourse: string,
+        type: number,
+        parentId: string | null,
+        status: number,
+        returnChildIds?: boolean
+    }) => {
+        try {
+            const match = {
+                idCourse: new Types.ObjectId(body.idCourse),
+                parentId: body.parentId,
+                type: body.type,
+            }
+            if (body.status) {
+                Object.assign(match, { status: body.status })
+            }
+            const data = await TopicModel.find(match).populate('topicChild')
+            let total = 0
+            const topicChildIds: string[] = []
+            data.forEach(topic => {
+                if (topic.topicChild.length) {
+                    topic.topicChild.map(child => {
+                        const childData = new Topic(child)
+                        if (childData.status === body.status) {
+                            total++;
+                            !!childData.id && topicChildIds.push(childData.id)
+                        }
+                    })
+
+                }
+            })
+            const result: {
+                data: Topic[],
+                total: number,
+                status: number,
+                topicChildIds?: string[]
+            } = {
+                data: data.map(o => {
+                    const topic = new Topic(o)
+                    topic.topicChildData = topic.topicChildData.filter(child => child.status === body.status)
+                    topic.topicChild = topic.topicChildData.map(child => child.id || "")
+                    return topic
+                }),
+                total,
+                status: TTCSconfig.STATUS_SUCCESS
+            }
+            if (body.returnChildIds) {
+                Object.assign(result, { topicChildIds })
+            }
+            return result
+        } catch (error) {
+            throw new BadRequestError();
+        }
+    }
+
+    countTopicInCourse = async (body: { courseId: string }) => {
+        const { courseId } = body
+
+        const [totalLearn, totalExam] = await Promise.all([
+            TopicModel.countDocuments({
+                idCourse: courseId,
+                topicChild: {
+                    $size: 0
+                },
+                status: TTCSconfig.STATUS_PUBLIC,
+                type: TTCSconfig.TYPE_LESSON
+            }),
+            TopicModel.countDocuments({
+                idCourse: courseId,
+                topicChild: {
+                    $size: 0
+                },
+                status: TTCSconfig.STATUS_PUBLIC,
+                type: TTCSconfig.TYPE_EXAM
+            })
+        ])
+
+        return {
+            data: {
+                totalLearn,
+                totalExam,
+            },
+            status: TTCSconfig.STATUS_SUCCESS
+        }
+
     }
 }

@@ -22,7 +22,7 @@ export default class TopicProgressService {
         }
 
         else if (courseId && type) {
-            const topicInCourse = await topicServices.getTopicsByCourse({
+            const topicInCourse = await topicServices.getTopicsByCourseMoblie({
                 idCourse: courseId,
                 status: TTCSconfig.STATUS_PUBLIC,
                 type,
