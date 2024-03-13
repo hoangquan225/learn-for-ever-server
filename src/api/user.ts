@@ -25,7 +25,7 @@ userRouter.post(Endpoint.UPDATE_USER, asyncHandler(async (req, res) => {
     }
 }));
 
-userRouter.post(Endpoint.GET_USER_FROM_TOKEN, authMiddleware, asyncHandler(async (req, res) => {
+userRouter.post(Endpoint.GET_USER_FROM_TOKEN, asyncHandler(async (req, res) => {
     // const { token } = <{ token: string }>req.body;
     const token = extractToken(req.headers.authorization || "")
     console.log({token});

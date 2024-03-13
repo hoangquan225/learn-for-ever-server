@@ -2,14 +2,20 @@ import * as _ from 'lodash';
 import asyncHandler from '../utils/async_handle';
 import { extractToken } from '../utils/helpers';
 import { UnauthorizedError } from '../common/errors';
-import { jwtDecodeToken } from '../utils/jwtToken';
+import { jwtDecodeToken, jwtEncode } from '../utils/jwtToken';
 import { UserModel } from '../database/users';
 import { UserInfo } from '../submodule/models/user';
 
+export const generateAccessToken = (data: any) => {
+  return jwtEncode(data)
+}
+
+export const generateRefreshToken = (data: any) => {
+  return jwtEncode(data)
+}
+
 export const authMiddleware = asyncHandler(async (req: any, res, next: any) => {
   const token = extractToken(req.headers.authorization || "")
-  console.log({authMiddleware: token});
-  
   if (!token) {
     return next(new UnauthorizedError('Token Invalid'));
     // throw res.json(new UnauthorizedError('Token Invalid'));

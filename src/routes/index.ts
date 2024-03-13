@@ -14,10 +14,9 @@ import { commentRouter } from '../api/comment';
 
 const router = Router();
 
-router.use(authRouter);
+router.use('/auth', authRouter);
 router.use(userRouter);
 router.use(categoryRouter);
-
 router.use(courseRouter);
 router.use(lessonRouter);
 router.use(questionRouter);
