@@ -1,7 +1,10 @@
+import _ from "lodash";
 import { BadRequestError } from "../common/errors";
 import { QuestionModel } from "../database/question";
 import TTCSconfig from "../submodule/common/config";
 import { Question } from "../submodule/models/question"
+import { TopicModel } from "../database/topic";
+import { Topic } from "../submodule/models/topic";
 
 export default class QuestionService {
     // get 
@@ -16,11 +19,19 @@ export default class QuestionService {
 
     getQuestionsByTopic = async (body: { status: number, idTopic: string }) => {
         try {
+            const topic = await TopicModel.findById(body.idTopic)
             const questions = await QuestionModel.find({
                 status: body.status, 
                 idTopic: body.idTopic
             })
-            return questions.map(o => new Question(o))
+            const questionsModel = questions.map(o => new Question(o))
+            const shuffledQuestions = _.shuffle(questionsModel.map(question => ({
+                ...question,
+                answer: _.shuffle(question.answer)
+            })));
+            const selectedQuestions = shuffledQuestions.slice(0, new Topic(topic).numQuestion);
+            return selectedQuestions;
+
         } catch (error) {
             throw new BadRequestError();
         }

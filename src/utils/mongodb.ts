@@ -12,7 +12,7 @@ const {
     DB_NAME = 'my_db'
 } = process.env;
 
-const DB_URL = `mongodb+srv://duyhung:${DB_PWD}@${DB_USER}.eyz9i9y.mongodb.net/?retryWrites=true&w=majority`;
+const DB_URL = `mongodb+srv://hoangquan:${DB_PWD}@${DB_USER}.s5rbuw0.mongodb.net/?retryWrites=true&w=majority`;
 
 const connectDatabase = (callback?: () => void) => {
     mongoose
