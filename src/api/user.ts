@@ -28,8 +28,6 @@ userRouter.post(Endpoint.UPDATE_USER, asyncHandler(async (req, res) => {
 userRouter.post(Endpoint.GET_USER_FROM_TOKEN, asyncHandler(async (req, res) => {
     // const { token } = <{ token: string }>req.body;
     const token = extractToken(req.headers.authorization || "")
-    console.log({token});
-    
     const users = await userService.checkUserFromToken(token);
     return res.json(users);
 }));

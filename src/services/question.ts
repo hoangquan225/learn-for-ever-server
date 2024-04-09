@@ -29,7 +29,7 @@ export default class QuestionService {
                 ...question,
                 answer: _.shuffle(question.answer)
             })));
-            const selectedQuestions = shuffledQuestions.slice(0, new Topic(topic).numQuestion);
+            const selectedQuestions = shuffledQuestions.slice(0, new Topic(topic).numQuestion || 1000);
             return selectedQuestions;
 
         } catch (error) {
