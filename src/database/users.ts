@@ -44,6 +44,7 @@ const UserSchema = new mongoose.Schema<UserInfoDoc, IUserSchema>(
         status: { type: Number, default: 1 },
         userRole: {type: Number, default: 1},
         lastLogin: { type: Number, default: 0 },
+        passwordResetExpires: { type: Number, default: 0 },
     },
     {
         versionKey: false,

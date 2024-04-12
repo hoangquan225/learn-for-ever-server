@@ -58,5 +58,38 @@ authRouter.post(Endpoint.LOGIN_WITH_GOOGLE, asyncHandler(async (req, res) => {
     });
 }));
 
+authRouter.post(Endpoint.FORGOT_PASSWORD,  asyncHandler(async (req, res) => {
+    const body = req.body;
+    const {data, status, message} = await authService.forgotPassword(body);
+    return res.json({
+        data,
+        status, 
+        message
+    });
+}));
+
+// authRouter.post(Endpoint.FORGOT_PASSWORD, authService.forgotPassword);
+// authRouter.post(Endpoint.CHECK_RESET_PASSWORD, authService.checkResetPassword);
+
+authRouter.post(Endpoint.CHECK_TOKEN_EXPIRES,  asyncHandler(async (req, res) => {
+    const body = req.body;
+    const {data, status, message} = await authService.checkTokenExpires(body);
+    return res.json({
+        data,
+        status, 
+        message
+    });
+}));
+
+authRouter.post(Endpoint.RESET_PASSWORD,  asyncHandler(async (req, res) => {
+    const body = req.body;
+    const {data, status, message} = await authService.resetPassword(body);
+    return res.json({
+        data,
+        status, 
+        message
+    });
+}));
+
 export { authRouter };
 
