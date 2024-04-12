@@ -146,9 +146,10 @@ class AuthServices {
                 status: TTCSconfig.STATUS_FAIL
             };
         }
-        const tokenExpires = 60;
+        const tokenExpires = 10*60;
         const resetToken = jwtEncode(user?._id, tokenExpires); 
-        const resetURl = `http://localhost:3002/reset-password?token=${resetToken}`;
+        const resetURl = `http://localhost:3002/reset-password/${resetToken}`;
+        // const resetURl = `http://localhost:3002/reset-password?token=${resetToken}`;
         const html = 
         `
             <div>
@@ -214,6 +215,14 @@ class AuthServices {
             }
             const decode = jwtDecodeToken(token);
             if (typeof decode === 'object' && decode !== null && '_id' in decode) {
+                const currentUser = await UserModel.findOne({_id: decode._id, passwordResetExpires: { $gt: Date.now() } });
+                if (!currentUser) {
+                    return {
+                        status: TTCSconfig.STATUS_FAIL,
+                        message: "Liên kết đã được sử dụng đổi mật khẩu trước đó",
+                        data: false
+                    };
+                }
                 return {
                     status: TTCSconfig.STATUS_SUCCESS,
                     message: "Thành công",
@@ -223,7 +232,7 @@ class AuthServices {
                 return {
                     status: TTCSconfig.STATUS_FAIL,
                     message: "Liên kết đã hết hạn! Vui lòng lấy token",
-                    data: token
+                    data: false
                 };
             }
         } catch (error) {
@@ -286,7 +295,7 @@ class AuthServices {
             } else {
                 return {
                     status: TTCSconfig.STATUS_FAIL,
-                    message: "This link has expired",
+                    message: "Mã token đã hết hạn hoặc bạn đã cập nhật mật khẩu trước đó!",
                     data: token
                 };
             }
