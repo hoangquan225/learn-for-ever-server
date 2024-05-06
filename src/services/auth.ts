@@ -209,7 +209,7 @@ class AuthServices {
             if (!token) {
                 return {
                     status: TTCSconfig.STATUS_FAIL,
-                    message: "Liên kết đã hết hạn! Vui lòng lấy token",
+                    message: "Liên kết đã hết hạn! Vui lòng chọn 'Quên mật khẩu lại'",
                     data: false
                 };
             }
@@ -231,7 +231,7 @@ class AuthServices {
             } else {
                 return {
                     status: TTCSconfig.STATUS_FAIL,
-                    message: "Liên kết đã hết hạn! Vui lòng lấy token",
+                    message: "Liên kết đã hết hạn! Vui lòng chọn 'Quên mật khẩu lại'",
                     data: false
                 };
             }
@@ -260,7 +260,7 @@ class AuthServices {
                 if (!currentUser) {
                     return {
                         status: TTCSconfig.STATUS_FAIL,
-                        message: "Tài khoản của bạn không tồn tài hoặc đã bị khóa",
+                        message: "Tài khoản của bạn không tồn tài hoặc đã bị khóa. Vui lòng liên hệ quản trị viên.",
                         data: token
                     };
                 }
