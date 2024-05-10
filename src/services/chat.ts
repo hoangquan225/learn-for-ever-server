@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 import { BadRequestError } from "../common/errors";
 import { userTableName } from "../database/users";
-import { deleteChatSocket, sendChatSocket, updateChatSocket } from "../socket";
+import { deleteChatSocket, getReceiverSocketId, sendChatSocket, updateChatSocket } from "../socket";
 import TTCSconfig from "../submodule/common/config";
 import { Chat } from "../submodule/models/chat";
 import { ChatModel } from "../database/chat";
 
 export default class ChatService {
   updateChat = async (body: Chat & { realTime?: boolean }) => {
-    const { id, realTime = true } = body;
+    const { id, userIdReceive, realTime = true } = body;
     let chatData: Chat = new Chat({});
     if (id) {
       // update
@@ -22,7 +22,8 @@ export default class ChatService {
             },
           },
           { new: true }
-        ).populate("idUser");
+        )
+        // .populate("idUser");
         if (!chat) {
           return {
             data: "không tồn tại",
@@ -31,6 +32,7 @@ export default class ChatService {
         }
         chatData = new Chat(chat);
         realTime && sendChatSocket({ chat: chatData });
+        // realTime && sendChatSocket1(userIdReceive, body.content);
         return {
           data: chatData,
           status: TTCSconfig.STATUS_SUCCESS,
@@ -39,13 +41,13 @@ export default class ChatService {
         throw new BadRequestError();
       }
     } else {
-      // create
       try {
         const newChat = await ChatModel.create({
           ...body,
           createDate: Date.now(),
           updateDate: Date.now(),
-        }).then(res => res.populate("userIdSend"));
+        })
+        // .then(res => res.populate("userIdSend"));
         chatData = new Chat(newChat);
         realTime && sendChatSocket({ chat: chatData });
         return {
@@ -53,6 +55,8 @@ export default class ChatService {
           status: TTCSconfig.STATUS_SUCCESS,
         };
       } catch (error) {
+        console.log({error});
+        
         throw new BadRequestError();
       }
     }
@@ -63,21 +67,15 @@ export default class ChatService {
       const { userIdSend, userIdReceive, limit, skip } = body;
       const chats = await Promise.all([
         ChatModel.find({
-          $or: [
-            { idChat: `${userIdSend}-${userIdReceive}`},
-            { idChat: `${userIdReceive}-${userIdSend}`},
-          ],
+          users: { $all: [userIdSend, userIdReceive] },
           status: TTCSconfig.STATUS_PUBLIC  
         })
           .skip(skip)
           .limit(limit)
-          .populate("idUser")
+          // .populate("idUser")
           .sort({ "createDate": -1 }),
         ChatModel.countDocuments({
-          $or: [
-            { idChat: `${userIdSend}-${userIdReceive}`},
-            { idChat: `${userIdReceive}-${userIdSend}`},
-          ],
+          users: { $all: [userIdSend, userIdReceive] },
           status: TTCSconfig.STATUS_PUBLIC
         })
       ])
@@ -87,6 +85,7 @@ export default class ChatService {
         status: TTCSconfig.STATUS_SUCCESS,
       };
     } catch (error) {
+      console.log({error});
       throw new BadRequestError();
     }
   };
@@ -118,7 +117,8 @@ export default class ChatService {
             },
           },
           { new: true }
-        ).populate("idUser");
+        )
+        // .populate("idUser");
         const chatData = new Chat(updateChat);
         realTime && updateChatSocket({ chat: chatData });
         return {

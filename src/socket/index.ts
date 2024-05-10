@@ -45,8 +45,16 @@ export function initSocket(srv: Server) {
         socket.on("writing_chat", (props: { idChat: string, userInfo: UserInfo }) => {
             io.in(`chat_room_${props.idChat}`).emit("writing_chat", props.userInfo)
         })
-
-        io.emit("getOnlineUsers", Object.keys(userSocketMap));
+        socket.on("newMessage", (newMessage) => {
+			// newMessage.shouldShake = true;
+			// setMessages([...messages, newMessage]);
+		});
+        // io.emit("getOnlineUsers", Object.keys(userSocketMap));
+        // socket.on("send-msg", (data) => {
+        // if (sendUserSocket) {
+        //     socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+        // }
+        // });
     });
 
     io.on('disconnect', () => {
@@ -65,10 +73,15 @@ export const deleteCommentSocket = (props: { id: String, idTopic: string }) => {
     io.sockets.in(`comment_room_${props.idTopic}`).emit('delete-comment', props);
 }
 
-
 export const sendChatSocket = (props: { chat: Chat }) => {
     io.sockets.in(`chat_room_${props.chat.idChat}`).emit('send-chat', props);
 }
+
+// export const sendChatSocket1 = (userIdReceive, newMessage) {
+//   // io.to(<socket_id>).emit() used to send events to specific client
+//   io.to( getReceiverSocketId(userIdReceive)).emit("newMessage", newMessage);
+// }
+
 export const updateChatSocket = (props: { chat: Chat }) => {
     io.sockets.in(`chat_room_${props.chat.idChat}`).emit('update-chat', props);
 }
