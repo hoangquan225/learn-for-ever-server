@@ -190,4 +190,16 @@ export default class UserService {
             throw new BadRequestError()
         }
     }
+
+    findByEmail = async (body: { email: string }) => {
+        try {
+            const user = await UserModel.find({email: { $regex: `^${body.email}`, $options: 'i' }})
+            return {
+                data: user?.map(e => new UserInfo(e)),
+                status: TTCSconfig.STATUS_SUCCESS
+            }
+        } catch (error) {
+            throw new BadRequestError()
+        }
+    }
 }

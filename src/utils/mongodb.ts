@@ -7,8 +7,8 @@ dotenv.config();
 const {
     DB_HOST = '127.0.0.1',
     DB_PORT = '27017',
-    DB_USER = 'duyhung',
-    DB_PWD = 'hung6789',
+    DB_USER = 'hoangquan',
+    DB_PWD = 'hoangquan225.qh',
     DB_NAME = 'my_db'
 } = process.env;
 

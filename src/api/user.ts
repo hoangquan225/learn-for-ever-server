@@ -56,4 +56,9 @@ userRouter.post(Endpoint.UPDATE_STUDYED_FOR_USER, asyncHandler(async (req, res) 
     return res.json(data)
 }))
 
+userRouter.post("/user/find-by-email", asyncHandler(async (req, res) => {
+    const data = await userService.findByEmail(req.body)
+    return res.json(data)
+}))
+
 export { userRouter };

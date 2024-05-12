@@ -1,20 +1,20 @@
 import mongoose, { Document, Model, model } from "mongoose";
-import { Chat } from "../submodule/models/chat";
+import { Message } from "../submodule/models/message";
 import { userTableName } from "./users";
 
-export const chatTable = "Chat"
-interface IChatSchema extends Model<ChatDoc> {
+export const chatTable = "Message"
+interface IMessageSchema extends Model<MessageDoc> {
 
 }
 
-export interface ChatDoc extends Chat, Document {
+export interface MessageDoc extends Message, Document {
     id: string;
 }
 
-const ChatSchema = new mongoose.Schema<ChatDoc, IChatSchema>(
+const MessageSchema = new mongoose.Schema<MessageDoc, IMessageSchema>(
     {
         content: String,
-        idChat: String,
+        roomId: String,
         userIdSend: {
             type: mongoose.Types.ObjectId, 
             ref: userTableName
@@ -24,10 +24,8 @@ const ChatSchema = new mongoose.Schema<ChatDoc, IChatSchema>(
             ref: userTableName
         },
         users: [String],
-        react: [{
-            type: {type: Number}, 
-            idUser: String
-        }],
+        react: Number,
+        type: Number, // 1: text, 2: image, 3: video, 4: file
         status: Number,
         index: Number,
         createDate : { type: Number, default: Date.now() },
@@ -38,6 +36,6 @@ const ChatSchema = new mongoose.Schema<ChatDoc, IChatSchema>(
     }
 );
 
-ChatSchema.path('userIdSend').ref(userTableName);
+MessageSchema.path('userIdSend').ref(userTableName);
 
-export const ChatModel = model(chatTable, ChatSchema);
+export const MessageModel = model(chatTable, MessageSchema);

@@ -1,5 +1,5 @@
 import express from 'express';
-import ChatService from '../services/chat';
+import ChatService from '../services/message';
 import ENDPONTAPI from '../submodule/common/endpoint';
 import asyncHandler from '../utils/async_handle';
 
@@ -23,15 +23,26 @@ chatRouter.post(ENDPONTAPI.SEND_REACTION_COMMENT, asyncHandler(async (req, res) 
 }))
 
 chatRouter.post(ENDPONTAPI.GET_CHAT, asyncHandler(async (req, res) => {
-    const {userIdSend, userIdReceive, limit = 10, skip = 0} = req.query
+    const {userIdSend, userIdReceive, roomId, limit = 20, skip = 0} = req.query
     const data = await chatService.getChatsByIdChat({
         userIdSend: `${userIdSend}`,
         userIdReceive: `${userIdReceive}`,
+        roomId: `${roomId}`,
         limit: Number(limit),
         skip: Number(skip)
     })
     
     return res.json(data)
+}))
+
+chatRouter.post("/room-chat/get-or-craete", asyncHandler(async (req, res) => {
+    const {data, status} = await chatService.getOrCreateRoomChat(req.body)
+    return res.json({data, status})
+}))
+
+chatRouter.post("/room-chat/get-friend", asyncHandler(async (req, res) => {
+    const {data, status} = await chatService.getFriendRoomChat(req.body)
+    return res.json({data, status})
 }))
 
 export {chatRouter}
