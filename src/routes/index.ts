@@ -13,6 +13,7 @@ import { statisticRouter } from '../api/CMS/statistic';
 import { commentRouter } from '../api/comment';
 import { topicProgressRouter } from '../api/topicProgress';
 import { chatRouter } from '../api/chat';
+import { uploadFileXlsRouter } from '../api/uploadExcel';
 
 const router = Router();
 
@@ -30,5 +31,6 @@ router.use(statisticRouter);
 router.use(commentRouter)
 router.use(topicProgressRouter)
 router.use(chatRouter)
+router.use(uploadFileXlsRouter)
 
 export { router as webRouters };

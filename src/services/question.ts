@@ -138,4 +138,37 @@ export default class QuestionService {
             throw new BadRequestError('khong ton tai')
         }
     }
+
+    createQuestionByExcel = async (body: {questions: any, idTopic: string, isDelete: boolean }) => {
+        try {
+            const { questions,  idTopic, isDelete } = body
+            if(isDelete) {
+                const result = await QuestionModel.deleteMany({idTopic});
+            } 
+            const questionsInsert = questions.map((e, index) => {
+                return new Question({
+                    question: e.question,
+                    answer: e.answer.map((o, i) => ({
+                        index: i,
+                        text: o[`answer${i}`],
+                        isResult: true,
+                    })),
+                    status: 1,
+                    idTopic : idTopic,
+                    index: index,
+                    hint: e.hint,
+                    createDate: Date.now(),
+                    updateDate: Date.now(),
+                })
+            })
+            const result = await QuestionModel.insertMany(questionsInsert);
+            return {
+                data: result,
+                status: TTCSconfig.STATUS_SUCCESS
+            }
+        } catch (error) {
+            throw new BadRequestError();
+        }
+    }
+
 }

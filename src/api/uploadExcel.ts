@@ -1,21 +1,47 @@
-// import Multer from "multer";
+import multer from "multer";
 // import readXlsxFile from "read-excel-file/node";
-// import express from "express";
-// import asyncHandler from '../utils/async_handle';
-// import logger from "../utils/logger";
+import express from "express";
+import asyncHandler from '../utils/async_handle';
+import logger from "../utils/logger";
+import { BadRequestError } from "../common/errors";
+import excelToJson from "convert-excel-to-json";
+import fs from "fs-extra";
 
-// const uploadFileXlsRouter = express.Router();
-// const multer = Multer({
-//   storage: Multer.memoryStorage(),
-//   limits: {
-//     fileSize: 5 * 1024 * 1024, // no larger than 5mb, you can change as needed.
-//   },
-// });
+const uploadFileXlsRouter = express.Router();
+// const storage = multer.diskStorage({});
+// const upload = multer({ storage, limit: { fileSize: 1024 * 1024 * 100 }, dest: "uploads/" }) //limit 100MB
+const upload = multer({ dest: "uploads/" }) //limit 100MB
+
+uploadFileXlsRouter.post("/read-excel-to-json", upload.single("file"), asyncHandler(async (req: any, res) => {
+    try {
+        console.log(req.file);
+        if(req.file?.filename == null || req.file?.filename == "undefined"){
+            throw res.json(new BadRequestError())
+        } else {
+            var filePath = "uploads/" + req.file.filename
+            const excelData = excelToJson({
+                sourceFile: filePath,
+                header: { 
+                    rows: 1
+                },
+                columnTokey: {
+                    "*":"{{columnHeader}}",
+                }
+            })
+            console.log(excelData);
+            fs.remove(filePath)
+            res.status(200).json(excelData)
+        }
+    } catch (error) {
+        console.log(error);
+        throw res.json(new BadRequestError())
+    }
+}))
 
 // uploadFileXlsRouter.post(
 //   "/upload-file-xls",
 //   multer.single("file"),
-//   asyncHandler(async (req, res) => {
+//   asyncHandler(async (req: any, res) => {
 //     if (!req.file) {
 //       res.status(400).send("No file uploaded.");
 //       return;
@@ -48,6 +74,7 @@
 //         cb(null, file.fieldname + '-' + datetimestamp + '.' + file.originalname.split('.')[file.originalname.split('.').length -1])
 //     }
 // });
+
 // var upload = multer({ //multer settings
 //     storage: storage,
 //     fileFilter : function(req, file, callback) { //file filter
@@ -57,21 +84,18 @@
 //         callback(null, true);
 //     }
 // }).single('file');
-// uploadFileXlsRouter.post('/upload', function(req, res) {
+
+// uploadFileXlsRouter.post('/upload', function(req: any, res) {
 //     var exceltojson;
 //     upload(req,res,function(err){
 //         if(err){
 //              res.json({error_code:1,err_desc:err});
 //              return;
 //         }
-//         /** Multer gives us file info in req.file object */
 //         if(!req.file){
 //             res.json({error_code:1,err_desc:"No file passed"});
 //             return;
 //         }
-//         /** Check the extension of the incoming file and 
-//          *  use the appropriate module
-//          */
 //         if(req.file.originalname.split('.')[req.file.originalname.split('.').length-1] === 'xlsx'){
 //             exceltojson = xlsxtojson;
 //         } else {
@@ -80,7 +104,7 @@
 //         try {
 //             exceltojson({
 //                 input: req.file.path,
-//                 output: null, //since we don't need output.json
+//                 output: null,
 //                 lowerCaseHeaders:true
 //             }, function(err,result){
 //                 if(err) {
@@ -94,4 +118,4 @@
 //     })
 // }); 
 
-// export { uploadFileXlsRouter };
+export { uploadFileXlsRouter };

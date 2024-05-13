@@ -33,6 +33,13 @@ questionRouter.post(Endpoint.UPDATE_QUESTION, asyncHandler(async (req, res) => {
     return res.json(data)
 }))
 
+// Endpoint.UPDATE_QUESTION_BY_EXCEL
+questionRouter.post("/question/update-question-by-excel", asyncHandler(async (req, res) => {
+    const { questions,  idTopic, isDelete = false } = req.body
+    const data = await questionService.createQuestionByExcel({questions, idTopic, isDelete})
+    return res.json(data)
+}))
+
 questionRouter.post(Endpoint.ORDER_QUESTION, asyncHandler(async (req, res) => {
     const data = await questionService.orderQuestion(req.body)
     return res.json(data)
