@@ -151,7 +151,7 @@ export default class QuestionService {
                     answer: e.answer.map((o, i) => ({
                         index: i,
                         text: o[`answer${i}`],
-                        isResult: true,
+                        isResult: i == 0,
                     })),
                     status: 1,
                     idTopic : idTopic,
