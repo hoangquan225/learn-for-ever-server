@@ -21,7 +21,7 @@ router.post("/login", async_handle(async (req, res) => {
     if (typeof account !== "undefined") queryUser.push({ account })
     if (typeof email !== "undefined") queryUser.push({ email })
     const user = await UserModel.findOne({
-        $or: queryUser, status: TTCSconfig.STATUS_PUBLIC
+        $or: queryUser, status: { $ne: TTCSconfig.STATUS_DELETED }
     })
     if (!user || !user.account) {
         return res.status(200).json({
@@ -62,7 +62,8 @@ router.post("/register", async_handle(async (req, res) => {
         $or: [
             { account },
             { email }
-        ]
+        ],
+        status: { $ne: TTCSconfig.STATUS_DELETED }
     })
     if (isExistUser) return res.status(200).json({
         status: TTCSconfig.LOGIN_ACCOUNT_IS_USED,
@@ -112,9 +113,9 @@ router.post("/send-code-reset-pass", async_handle(async (req, res) => {
     const queryUser: any[] = []
     if (typeof account !== "undefined") queryUser.push({ account })
     if (typeof email !== "undefined") queryUser.push({ email })
-    logger.debug("query user : ", queryUser, { account }, {email})
+    logger.debug("[send-code-reset-pass] query user : ", queryUser, { account }, { email })
     const user = await UserModel.findOne({
-        $or: queryUser, status: TTCSconfig.STATUS_PUBLIC
+        $or: queryUser, status: { $ne: TTCSconfig.STATUS_DELETED }
     })
     logger.debug("[send code]: user", user?._id)
     if (!user || !user.email) {
@@ -154,39 +155,39 @@ router.post("/reset-pass-word", async_handle(async (req, res) => {
     if (typeof account !== "undefined") queryUser.push({ account })
     if (typeof email !== "undefined") queryUser.push({ email })
     const user = await UserModel.findOne({
-        $or: queryUser, status: TTCSconfig.STATUS_PUBLIC
+        $or: queryUser, status: { $ne: TTCSconfig.STATUS_DELETED }
     })
     if (!user || !user.email || !user.account) {
         return res.status(200).json({
             status: TTCSconfig.STATUS_NO_EXIST,
         })
     }
-    if(user.verification_code !== code) { 
+    if (user.verification_code !== code) {
         return res.json({
             status: TTCSconfig.STATUS_FAIL,
             message: 'Mã code không chính xác'
         })
     }
-    if(moment(user.verification_created_at || 0).add(5, "minutes").isBefore(moment())) {
+    if (moment(user.verification_created_at || 0).add(5, "minutes").isBefore(moment())) {
         return res.json({
-            status:TTCSconfig.STATUS_FAIL,
+            status: TTCSconfig.STATUS_FAIL,
             message: 'Mã code hết hạn'
         })
     }
 
     await UserModel.findOneAndUpdate({
         _id: user._id
-    }, { 
-        $set: { 
+    }, {
+        $set: {
             password: encodeSHA256Pass(user.account, newPwd)
-        }, 
+        },
         $unset: {
             verification_code: "",
             verification_created_at: ""
         }
     })
 
-    return res.json({ 
+    return res.json({
         status: TTCSconfig.STATUS_SUCCESS
     })
 
