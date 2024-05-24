@@ -45,6 +45,8 @@ const UserSchema = new mongoose.Schema<UserInfoDoc, IUserSchema>(
         userRole: {type: Number, default: 1},
         lastLogin: { type: Number, default: 0 },
         passwordResetExpires: { type: Number, default: 0 },
+        verification_code: String, 
+        verification_created_at: Number
     },
     {
         versionKey: false,
