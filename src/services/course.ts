@@ -5,13 +5,16 @@ import { TopicModel } from "../database/topic";
 import TTCSconfig from "../submodule/common/config";
 import { Course } from "../submodule/models/course";
 import { Topic } from "../submodule/models/topic";
+import { CategoryModel, categoryTable } from "../database/category";
+import e from "cors";
 
 export default class CourseService {
     // get 
     getCoursesByStatus = async (body: {status: number}): Promise<Course[]> => {
         try {
-            const courses = await CourseModel.find({status: body.status})
-            return courses
+            const courses = await CourseModel.find({status: body.status}).populate('idCategory').sort({ "createDate": -1 })
+            const data = courses.filter((e: any) => e.idCategory?.status === 1);
+            return data
         } catch (error) {
             throw new BadRequestError();
         }
