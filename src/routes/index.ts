@@ -14,6 +14,7 @@ import { commentRouter } from '../api/comment';
 import { topicProgressRouter } from '../api/topicProgress';
 import { chatRouter } from '../api/chat';
 import { uploadFileXlsRouter } from '../api/uploadExcel';
+import { rasaRouter } from '../api/rasa';
 
 const router = Router();
 
@@ -32,5 +33,6 @@ router.use(commentRouter)
 router.use(topicProgressRouter)
 router.use(chatRouter)
 router.use(uploadFileXlsRouter)
+router.use(rasaRouter)
 
 export { router as webRouters };
