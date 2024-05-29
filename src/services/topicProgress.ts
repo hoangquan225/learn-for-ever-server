@@ -7,6 +7,9 @@ import { TopicProgress } from "../submodule/models/topicProgress";
 import TopicService from "./topic";
 import { CourseModel } from "../database/course";
 import { Course } from "../submodule/models/course";
+import { TopicModel } from "../database/topic";
+import { QuestionModel } from "../database/question";
+import { Question } from "../submodule/models/question";
 
 
 const topicServices = new TopicService();
@@ -153,4 +156,45 @@ export default class TopicProgressService {
             }
         }
     }
+
+    scoreCalculation = async (body) => {
+        try {
+            const { idTopic, idUser, idCourse, timeStudy, questionAnswers } = body
+            let correctCount = 0;
+            let incorrectCount = 0;
+            let unansweredCount = 0;
+            const questions = await QuestionModel.find({
+                status: 1,
+                idTopic
+            }) 
+            const questionsModel = questions.map(o => new Question(o))
+            questionsModel.forEach((e: any) => {
+                const answerId = questionAnswers[e.id];
+                if (!answerId) {
+                    unansweredCount++;
+                } else {
+                    const correctAnswer = e.answer.find(answer => answer._id.toString() === answerId && answer.isResult);
+                    if (correctAnswer) {
+                        correctCount++;
+                    } else {
+                        incorrectCount++;
+                    }
+                }
+            });
+            let score = correctCount/(incorrectCount+unansweredCount+correctCount);
+            return {
+                correctCount,
+                incorrectCount,
+                unansweredCount,
+                score
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                data: null,
+                status: TTCSconfig.STATUS_FAIL
+            }
+        }
+    }
+    
 }

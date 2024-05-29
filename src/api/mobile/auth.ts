@@ -43,7 +43,8 @@ router.post("/login", async_handle(async (req, res) => {
 
     return res.json({
         status: TTCSconfig.STATUS_SUCCESS,
-        token
+        token,
+        id: user._id
     })
 }))
 
@@ -83,8 +84,8 @@ router.post("/register", async_handle(async (req, res) => {
 
 router.post("/user", jwtMiddleware, async_handle(async (req, res) => {
     const { _id } = req.body;
-    console.log("req.body ", req.body);
     const user = await UserModel.findOne({ _id });
+    console.log({_id});
     return res.json(user)
 }))
 
