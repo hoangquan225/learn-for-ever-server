@@ -83,8 +83,8 @@ router.post("/register", async_handle(async (req, res) => {
 
 router.post("/user", jwtMiddleware, async_handle(async (req, res) => {
     const { _id } = req.body;
+    console.log("req.body ", req.body);
     const user = await UserModel.findOne({ _id });
-
     return res.json(user)
 }))
 

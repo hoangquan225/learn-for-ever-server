@@ -8,6 +8,7 @@ export const jwtMiddleware = (req: Request, res: Response, next: NextFunction) =
         const { token } = req.body as { token: string };
         if (!token) return res.status(401).json({})
         const decode = jwtDecodeToken(token);
+        console.log({decode});
         if (!decode || typeof decode === "string") return res.status(401).json({});
         req.body._id = decode._id
 
