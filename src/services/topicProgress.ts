@@ -181,10 +181,10 @@ export default class TopicProgressService {
                     }
                 }
             });
-            let score = correctCount/(incorrectCount+unansweredCount+correctCount);
+            let score = correctCount/(incorrectCount+unansweredCount+correctCount)*10;
             return {
                 correctCount,
-                incorrectCount,
+                incorrectCount: incorrectCount+unansweredCount,
                 unansweredCount,
                 score
             };
@@ -196,5 +196,4 @@ export default class TopicProgressService {
             }
         }
     }
-    
 }

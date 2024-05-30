@@ -1,9 +1,11 @@
 import express from 'express';
 import async_handle from '../../utils/async_handle';
 import TopicProgressService from '../../services/topicProgress';
+import UserService from '../../services/user';
 
 const topicProgressRouter = express.Router();
 const topicProgressServices = new TopicProgressService();
+const userService = new UserService();
 
 topicProgressRouter.post("/update-topic-progress", async_handle(async (req, res) => { 
     const data = await topicProgressServices.upsertTopicProgress(req.body)
@@ -25,24 +27,25 @@ topicProgressRouter.post("/update-study", async_handle(async (req, res) => {
         };
         convertedArray.push(newObj);
     }
-    const { correctCount, incorrectCount, unansweredCount, score } = await topicProgressServices.scoreCalculation(body)
-    const payload = {
+
+    const { correctCount, incorrectCount, score } = await topicProgressServices.scoreCalculation(body)
+    const payload: any = {
         idTopic: body.idTopic,
         idCourse: body.idCourse,
         idUser: body.idUser,
-        status: body.status,
+        status: 2,
         timeStudy: body.timeStudy,
         score: score,
         correctQuestion: correctCount,
         answers: convertedArray
     }
-    const data = await topicProgressServices.upsertTopicProgress(payload)
-    console.log({data});
+    await topicProgressServices.upsertTopicProgress(payload)
+    await userService.updateStudyedForUser(payload)
     res.json({
         status: 0,
         score,
         numCorrect: correctCount,
-        numIncorrect: incorrectCount 
+        numIncorrect: incorrectCount
     })
 }))
 
