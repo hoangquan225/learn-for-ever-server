@@ -202,4 +202,41 @@ export default class UserService {
             throw new BadRequestError()
         }
     }
+
+    updateStatusUser = async (body: { userId: string, status: number }) => {
+        try {
+           const { userId, status } = body;
+            const updatedUser = await UserModel.findOneAndUpdate(
+                { _id: userId }, 
+                { status: status },
+                { new: true }
+            );
+            return {
+                data: updatedUser,
+                status: updatedUser ? TTCSconfig.STATUS_SUCCESS :  TTCSconfig.STATUS_FAIL
+            }
+        } catch (error) {
+            throw new BadRequestError()
+        }
+    }
+
+    getAllUser = async (status: any) => {
+        try {
+            let query = {
+                status: {$ne: TTCSconfig.STATUS_DELETED},
+                userRole: {$ne: TTCSconfig.ROLE_ADMIN},
+            };
+            
+            if (status != -2 && status !== undefined) {
+                query.status = status;
+            }
+            const users = await UserModel.find(query);
+            return {
+                data: users.map((user) => new UserInfo(user)),
+                status: TTCSconfig.STATUS_SUCCESS
+            };
+        } catch (error) {
+            throw new BadRequestError();
+        }
+    };
 }

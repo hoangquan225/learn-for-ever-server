@@ -61,4 +61,15 @@ userRouter.post("/user/find-by-email", asyncHandler(async (req, res) => {
     return res.json(data)
 }))
 
+userRouter.post("/cms/user/update-status-user", authMiddleware, asyncHandler(async (req, res) => {
+    const data = await userService.updateStatusUser(req.body)
+    return res.json(data)
+}))
+
+userRouter.post("/cms/user/get-all-user", authMiddleware, asyncHandler(async (req, res) => {
+    const data = await userService.getAllUser(req.query.status)
+    
+    return res.json(data)
+}))
+
 export { userRouter };

@@ -26,7 +26,7 @@ class AuthServices {
         const passEncode = this.processPass(body);
         let userInfo = new UserInfo({ ...body, password: body.password });
         try {
-            const checkUserAcc: UserInfo | null = await UserModel.findOne(typeof body.userRole === 'number' ? {account: userInfo.account, userRole: body.userRole} : { account: userInfo.account });
+            const checkUserAcc: UserInfo | null = await UserModel.findOne(typeof body.userRole === 'number' ? {account: userInfo.account, userRole: body.userRole} : { account: userInfo.account, status: 1 });
             if (checkUserAcc) {
                 if (passEncode === checkUserAcc.password) {
                     userInfo = new UserInfo(checkUserAcc);
@@ -64,7 +64,7 @@ class AuthServices {
                     ...userInfo,
                     password: passEncode,
                     registerDate: Date.now(),
-                    status: TTCSconfig.UserStatus.NORMAL,
+                    status: TTCSconfig.STATUS_PUBLIC,
                     lastLogin: Date.now()
                 }
                 const newUser = await UserModel.create(newUserInfo)
