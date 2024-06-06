@@ -43,14 +43,19 @@ export default class RasaService {
 
     }
 
-    getCourse10 = async (body: any) => {
+    getCourseInfo = async (body: any) => {
         try {
-            // const params: any = JSON.parse(body)
+            const params: any = JSON.parse(body.params);
+            const { grade = 10 } = body
+            
             const categorys = await CategoryModel.findOne({
-                slug: "lop-10",
+                slug: `lop-${grade}`,
                 status: TTCSconfig.STATUS_PUBLIC,
             });
-            const course = await CourseModel.find({ idCategory: categorys?.id });
+            const course = await CourseModel.find({ 
+                idCategory: categorys?.id, 
+                status: TTCSconfig.STATUS_PUBLIC
+            });
             let revertData: any = course.map((e: any) => ({
                 message: e.courseName,
                 type: "redict",
@@ -58,7 +63,7 @@ export default class RasaService {
             }))
 
             revertData = [{
-                message: "Đây là các môn học " + categorys?.name + ", ấn vào môn học mà bạn để đến trang học!!!",
+                message: "Đây là các môn học " + categorys?.name + ", ấn vào môn học mà bạn muốn để đến trang học!!!",
                 type: "text"
             }, ...revertData]
 

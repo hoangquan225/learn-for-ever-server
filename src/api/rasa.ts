@@ -14,8 +14,8 @@ rasaRouter.get("/getStatistic", asyncHandler(async (req, res) => {
     })
 }))
 
-rasaRouter.get("/getCourse10", asyncHandler(async (req, res) => {
-    const {data, status} = await rasaService.getCourse10(req.query.params)
+rasaRouter.get("/getCourseInfo", asyncHandler(async (req, res) => {
+    const {data, status} = await rasaService.getCourseInfo(req.query)
     return res.json({
         data
     })
