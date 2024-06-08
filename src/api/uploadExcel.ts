@@ -24,7 +24,7 @@ uploadFileXlsRouter.post("/read-excel-to-json", upload.single("file"), asyncHand
                 header: { 
                     rows: 1
                 },
-                columnTokey: {
+                columnToKey: {
                     "*":"{{columnHeader}}",
                 }
             })
