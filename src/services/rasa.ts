@@ -29,6 +29,11 @@ export default class RasaService {
                 //         )
             }))
 
+            revertData = [{
+                message: "Đây là các môn học và các đề kiểm tra bạn đã học và làm.",
+                type: "text"
+            }, ...revertData]
+
             return {
                 status: TTCSconfig.STATUS_SUCCESS,
                 data: revertData
@@ -63,7 +68,7 @@ export default class RasaService {
             }))
 
             revertData = [{
-                message: "Đây là các môn học " + categorys?.name + ", ấn vào môn học mà bạn muốn để đến trang học!!!",
+                message: categorys?.des + " Ấn vào môn học mà bạn muốn để đến trang học!!!",
                 type: "text"
             }, ...revertData]
 

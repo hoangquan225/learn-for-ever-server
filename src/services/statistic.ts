@@ -2,6 +2,8 @@ import _ from "lodash"
 import moment from "moment"
 import { FeedbackModel } from "../database/feedback"
 import { UserModel } from "../database/users"
+import { CategoryModel } from "../database/category"
+import { BadRequestError } from "../common/errors"
 
 export default class StatisticService {
     loadNumByValueMonth = async (valueMonth: moment.Moment) => {
@@ -50,6 +52,15 @@ export default class StatisticService {
             }))
             return _.orderBy(data, ['date'], "asc")
 
+        }
+    }
+
+    getCategoryStatistic = async (payload) => {
+        try {
+            const categorys = await CategoryModel.find({ status: payload.status });
+            return categorys;
+        } catch (error) {
+            throw new BadRequestError();
         }
     }
 }

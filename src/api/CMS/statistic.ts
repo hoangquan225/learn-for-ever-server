@@ -16,4 +16,13 @@ statisticRouter.post(Endpoint.LOAD_STATISTIC, asyncHandler(async (req, res) => {
     })
 }))
 
+statisticRouter.post("/cms/get-category-statistic", asyncHandler(async (req, res) => {
+    const data = await statisticService.getCategoryStatistic(req.body)
+    return res.json({
+        data,
+        status: TTCSconfig.STATUS_SUCCESS
+    })
+}))
+
+
 export {statisticRouter}
