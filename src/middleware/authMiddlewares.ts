@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import asyncHandler from '../utils/async_handle';
 import { extractToken } from '../utils/helpers';
-import { UnauthorizedError } from '../common/errors';
+import { ForbiddenError, UnauthorizedError } from '../common/errors';
 import { jwtDecodeToken, jwtEncode } from '../utils/jwtToken';
 import { UserModel } from '../database/users';
 import { UserInfo } from '../submodule/models/user';
@@ -54,26 +54,11 @@ export const authMiddleware = asyncHandler(async (req: any, res, next: any) => {
   next();
 });
 
-// export class AuthMiddleware {
-//   async use(req: Request, res: Response, next: NextFunction) {
-//     const token = extractToken(req.headers['authorization'] || '');
-//     try {
-//       const decodedToken = await jwtDecodeToken(token);
-//       next();
-//     } catch (error) {
-//       // if (_.get(error, 'name', '') === 'TokenExpiredError') {
-//       //   throw new UnauthorizedError('Token Expired');
-//       // }
-//       throw new UnauthorizedError('Unauthorized');
-//     }
-//   }
-// }
-
 export const isAdmin = asyncHandler(async (req: any, res, next: any) => {
   const { email } = req.user;
   const adminUser = new UserInfo(await UserModel.findOne({ email }));
   if (adminUser.userRole !== 0) {
-    throw res.json(new UnauthorizedError('You are not an Admin'));
+    return next(new ForbiddenError());
   } else {
     next();
   }
