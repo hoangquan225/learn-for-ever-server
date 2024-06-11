@@ -74,7 +74,7 @@ export default class StatisticService {
             const categories = categoryModel.map(e => new Category(e))
             const categoryIds = categories.map(category => category.id);
 
-            const courses = await CourseModel.find({ categoryId: { $in: categoryIds }, status: TTCSconfig.STATUS_PUBLIC });
+            const courses = await CourseModel.find({ idCategory: { $in: categoryIds }, status: TTCSconfig.STATUS_PUBLIC });
 
             const result = categories.map(category => ({
             ...category,
@@ -96,10 +96,70 @@ export default class StatisticService {
         idCategory?: string,
     }) => {
         try {
-            const query = {}
-            const data = (await TopicProgressModel.find(query)).map(o => new TopicProgress(o))
-            return null;
+            const { startTime, endTime, idCourse, idCategory } = payload
+            if(idCategory) {
+                const courses = await CourseModel.find({ idCategory: idCategory, status: TTCSconfig.STATUS_PUBLIC });
+                const courseNameMap = courses.reduce((map, course) => {
+                    map[course._id] = course.courseName;
+                    return map;
+                }, {} as Record<string, string>);
+    
+                const courseIds = courses.map(course => course._id);
+    
+                const query: any = { idCourse: { $in: courseIds } };
+                if (startTime && endTime) query.createdAt = { '$gte': new Date(startTime), '$lte': new Date(endTime) }
+    
+                const topicProgressData = await TopicProgressModel.find(query);
+    
+                const courseStatistics = courseIds.reduce((acc, courseId) => {
+                    // const courseName = courseNameMap[courseId];
+                    // acc[courseName] = topicProgressData.filter((tp: any) => tp.idCourse.equals(courseId)).length;
+                    // return acc;
+                    const courseName = courseNameMap[courseId];
+                    const userIds: string[] = []; 
+                    let numUniqueUsers = 0; 
+    
+                    topicProgressData.forEach((tp: any) => {
+                        if (tp.idCourse.equals(courseId) && !userIds.includes(tp.idUser.toString())) {
+                            userIds.push(tp.idUser.toString());
+                            numUniqueUsers++;
+                        }
+                    });
+                    acc[courseName] = numUniqueUsers;
+                    return acc;
+                }, {} as Record<string, number>);
+                return courseStatistics;
+            }
+
+            if(idCourse) {
+                const query: any = { idCourse: idCourse };
+                if (startTime && endTime) query.createdAt = { '$gte': new Date(startTime), '$lte': new Date(endTime) }
+    
+                const topicProgressData = await TopicProgressModel.find(query);
+                const userIdsLecture: string[] = []; 
+                const userIdsTest: string[] = []; 
+                let numTest = 0; 
+                let numLesson = 0; 
+
+                topicProgressData.forEach((tp: any) => {
+                    if (tp.type === 1 && !userIdsLecture.includes(tp.idUser.toString())) {
+                        numLesson++;
+                        userIdsLecture.push(tp.idUser.toString());
+                    } else if (tp.type === 2 && !userIdsTest.includes(tp.idUser.toString())) {
+                        numTest++;
+                        userIdsTest.push(tp.idUser.toString());
+                    }
+                });
+    
+                return  {
+                    "Chương trình học": numLesson,
+                    "Đề kiểm tra": numTest,
+                };
+            }
+            return null
         } catch (error) {
+            console.log(error);
+            
             throw new BadRequestError();
         }
     }

@@ -46,7 +46,7 @@ const TopicProgressSchema = new mongoose.Schema<TopicProgressDoc, ITopicProgress
     },
     {
         versionKey: false,
-        // timestamps: true,
+        timestamps: true,
     }
 );
 
