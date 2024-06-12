@@ -172,6 +172,9 @@ export default class TopicProgressService {
                 status: 1,
                 idTopic
             }) 
+            const topic = await TopicModel.findOne({ _id: idTopic })
+            const numQuestion = topic?.numQuestion || 15
+            console.log(topic);
             const questionsModel = questions.map(o => new Question(o))
             questionsModel.forEach((e: any) => {
                 const answerId = questionAnswers[e.id];
@@ -186,10 +189,10 @@ export default class TopicProgressService {
                     }
                 }
             });
-            let score = correctCount/(incorrectCount+unansweredCount+correctCount)*10;
+            let score = correctCount/(numQuestion)*10;
             return {
                 correctCount,
-                incorrectCount: incorrectCount+unansweredCount,
+                incorrectCount: numQuestion - correctCount,
                 unansweredCount,
                 score
             };
