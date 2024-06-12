@@ -17,7 +17,7 @@ export default class QuestionService {
         }
     }
 
-    getQuestionsByTopic = async (body: { status: number, idTopic: string }) => {
+    getQuestionsByTopic = async (body: { status: number, idTopic: string, isCms?: boolean }) => {
         try {
             const topic = await TopicModel.findById(body.idTopic)
             const questions = await QuestionModel.find({
@@ -29,7 +29,11 @@ export default class QuestionService {
                 ...question,
                 answer: _.shuffle(question.answer)
             })));
-            const selectedQuestions = shuffledQuestions.slice(0, new Topic(topic).numQuestion || 1000);
+            let selectedQuestions = shuffledQuestions
+            if(!body.isCms) {
+                 selectedQuestions = shuffledQuestions.slice(0, new Topic(topic).numQuestion || 1000);
+            }
+
             return selectedQuestions;
 
         } catch (error) {

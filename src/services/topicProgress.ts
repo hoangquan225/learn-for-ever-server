@@ -132,7 +132,12 @@ export default class TopicProgressService {
                 {
                     $or: [
                         { _id: new mongoose.Types.ObjectId(body._id) },
-                        { idTopic: new mongoose.Types.ObjectId(body.idTopic) }
+                        {
+                            $and: [
+                                { idTopic: new mongoose.Types.ObjectId(body.idTopic) },
+                                { idUser: new mongoose.Types.ObjectId(body.idUser) }
+                            ]
+                        }
                     ]
                 },
                 {
